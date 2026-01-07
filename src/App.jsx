@@ -208,7 +208,8 @@ function App() {
           onExportPNG={handleExportPNG}
           onImport={handleImport}
         />
-        <SchemaCanvas
+        <div className="flex-1">
+          <SchemaCanvas
           ref={canvasRef}
           tool={tool}
           nodeShape={nodeShape}
@@ -235,6 +236,7 @@ function App() {
             // Optional: could be used for future features
           }}
         />
+        </div>
       </div>
       {exportPNGModal && (
         <Modal
