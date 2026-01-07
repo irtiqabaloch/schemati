@@ -32,6 +32,12 @@ export default function Modal({ isOpen, onClose, title, fields, onSubmit }) {
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen, onClose])
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   if (!isOpen) return null
 
   const handleSubmit = (e) => {
@@ -50,7 +56,10 @@ export default function Modal({ isOpen, onClose, title, fields, onSubmit }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
       <div
         ref={modalRef}
         className="bg-card border border-border rounded-lg shadow-2xl w-full max-w-[80vw] max-h-[80vh] flex flex-col"

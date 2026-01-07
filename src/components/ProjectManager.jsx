@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Label } from './ui/label'
@@ -23,6 +23,26 @@ export default function ProjectManager({
   const [editingProject, setEditingProject] = useState(null)
   const [editingName, setEditingName] = useState('')
   const [saveDialog, setSaveDialog] = useState(null)
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        if (saveDialog) {
+          setSaveDialog(null)
+        } else if (isOpen) {
+          onClose()
+        }
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose, saveDialog])
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
 
   const handleRename = (projectId, currentName) => {
     setEditingProject(projectId)
@@ -53,16 +73,19 @@ export default function ProjectManager({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-card border border-border rounded-lg shadow-2xl max-w-4xl w-full max-h-[80vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <h2 className="text-xl font-semibold">Project Manager</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+        <div className="p-6 overflow-y-auto flex-1 min-h-0">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <Button onClick={onNewProject} className="flex items-center gap-2">
@@ -97,7 +120,7 @@ export default function ProjectManager({
                 type="checkbox"
                 checked={autosaveEnabled}
                 onChange={onToggleAutosave}
-                className="rounded"
+                className="rounded border-input"
               />
             </div>
           </div>
@@ -111,7 +134,7 @@ export default function ProjectManager({
               </div>
             ) : (
               projects.map(project => (
-                <Card key={project.id} className={`transition-all ${currentProjectId === project.id ? 'ring-2 ring-primary' : ''}`}>
+                <Card key={project.id} className={`transition-all border-border ${currentProjectId === project.id ? 'ring-2 ring-primary border-primary' : ''}`}>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       {editingProject === project.id ? (
@@ -195,15 +218,31 @@ export default function ProjectManager({
       </div>
 
       {saveDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="flex items-center justify-between p-6 border-b">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+          onClick={(e) => {
+            if(e.target === e.currentTarget) setSaveDialog(null)
+          }}
+        >
+          <div className="bg-card border border-border rounded-lg shadow-2xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-border">
               <h3 className="text-lg font-semibold">{saveDialog.title}</h3>
               <Button variant="ghost" size="icon" onClick={() => setSaveDialog(null)}>
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <div className="p-6">
+            <form 
+              className="p-6"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const formData = new FormData(e.target)
+                const values = {}
+                saveDialog.fields.forEach(field => {
+                  values[field.name] = formData.get(field.name)
+                })
+                saveDialog.onSubmit(values)
+              }}
+            >
               <div className="space-y-4">
                 {saveDialog.fields.map(field => (
                   <div key={field.name}>
@@ -212,42 +251,24 @@ export default function ProjectManager({
                     </Label>
                     <Input
                       id={field.name}
+                      name={field.name}
                       type={field.type}
                       defaultValue={field.defaultValue}
                       className="mt-1"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          const formData = new FormData(e.target.form)
-                          const values = {}
-                          saveDialog.fields.forEach(field => {
-                            values[field.name] = formData.get(field.name)
-                          })
-                          saveDialog.onSubmit(values)
-                        }
-                      }}
+                      autoFocus
                     />
                   </div>
                 ))}
               </div>
               <div className="flex justify-end gap-2 mt-6">
-                <Button variant="outline" onClick={() => setSaveDialog(null)}>
+                <Button type="button" variant="outline" onClick={() => setSaveDialog(null)}>
                   Cancel
                 </Button>
-                <Button onClick={() => {
-                  const form = document.querySelector('form')
-                  if (form) {
-                    const formData = new FormData(form)
-                    const values = {}
-                    saveDialog.fields.forEach(field => {
-                      values[field.name] = formData.get(field.name)
-                    })
-                    saveDialog.onSubmit(values)
-                  }
-                }}>
+                <Button type="submit">
                   Save
                 </Button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
