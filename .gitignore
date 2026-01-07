@@ -15,6 +15,3 @@ dist-ssr
 
 .claude/
 CLAUDE.md
-
-.env
-.env.local
