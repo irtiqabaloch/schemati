@@ -9,18 +9,26 @@ Create diagrams and flowcharts with ease. A powerful and intuitive diagramming t
 - **Customizable Styles**: Colors, borders, shadows, and more
 - **Magnetic Snapping**: Smart alignment system for precise positioning
 - **Grid System**: Optional grid with customizable size
-- **Export Options**: PNG export with transparent backgrounds
+- **Project Management**: Save, load, and manage multiple projects
+- **Auto-save**: Automatic saving to browser localStorage
+- **Undo/Redo**: Full history management with Ctrl+Z/Ctrl+Y
+- **Export Options**: PNG export with transparent backgrounds and JSON project files
 - **Dark/Light Theme**: Automatic theme switching
 - **Responsive Design**: Works on desktop and mobile devices
 
 ## Getting Started
 
-### Prerequisites
+### Online Version
+Visit [Schemati](https://kirosnn.github.io/schemati) to use the application directly in your browser!
+
+### Local Development
+
+#### Prerequisites
 
 - Node.js (v16 or higher)
 - npm or yarn
 
-### Installation
+#### Installation
 
 1. Clone the repository:
 ```bash
@@ -44,6 +52,7 @@ npm run dev
 
 ## Usage
 
+### Basic Tools
 - **Select Tool**: Click and drag to select and move elements
 - **Node Tool**: Click and drag to create new nodes
 - **Text Tool**: Click to add text elements
@@ -51,12 +60,26 @@ npm run dev
 - **Border Tool**: Click and drag to create borders
 - **Delete Tool**: Click on elements to remove them
 
+### Project Management
+- **Project Manager**: Access via the folder icon or Ctrl+P to save/load projects
+- **Auto-save**: Automatically saves your work to browser storage (can be disabled)
+- **Import/Export**: Export projects as JSON files or import existing ones
+- **History**: Full undo/redo support with Ctrl+Z/Ctrl+Y
+
+### Tips
+- Projects are automatically saved to your browser's localStorage
+- Use magnetic snapping for precise alignment
+- The grid helps with consistent spacing
+- Export your diagrams as PNG for sharing
+
 ## Keyboard Shortcuts
 
+- `Ctrl+Z` / `Cmd+Z`: Undo last action
+- `Ctrl+Y` / `Cmd+Y` or `Ctrl+Shift+Z`: Redo last undone action
+- `Ctrl+P` / `Cmd+P`: Open project manager
+- `Ctrl+S` / `Cmd+S`: Save current project
 - `Ctrl+C` / `Cmd+C`: Copy selected element
 - `Ctrl+V` / `Cmd+V`: Paste copied element
-- `Ctrl+Z` / `Cmd+Z`: Undo (coming soon)
-- `Ctrl+Y` / `Cmd+Y`: Redo (coming soon)
 
 ## Contributing
 

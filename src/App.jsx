@@ -1,9 +1,12 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import SchemaCanvas from './components/SchemaCanvas'
 import Sidebar from './components/Sidebar'
 import Modal from './components/Modal'
+import ProjectManager from './components/ProjectManager'
 import { useTheme } from './hooks/useTheme'
-import { Moon, Sun, Github, Star } from 'lucide-react'
+import { useHistory } from './hooks/useHistory'
+import { useProjectManager } from './hooks/useProjectManager'
+import { Moon, Sun, Github, Star, FolderOpen, Undo, Redo } from 'lucide-react'
 import { Button } from './components/ui/button'
 
 function App() {
@@ -28,8 +31,36 @@ function App() {
   const [nodes, setNodes] = useState([])
   const [connections, setConnections] = useState([])
   const [borders, setBorders] = useState([])
+  const [projectManagerOpen, setProjectManagerOpen] = useState(false)
   const fileInputRef = useRef(null)
   const canvasRef = useRef(null)
+
+  const {
+    projects,
+    currentProjectId,
+    autosaveEnabled,
+    saveProject,
+    loadProject,
+    deleteProject,
+    renameProject,
+    newProject: resetProject,
+    toggleAutosave,
+    exportProject,
+    importProject,
+    autosave
+  } = useProjectManager()
+
+  const { undo, redo, canUndo, canRedo, reset: resetHistory, pushState, initialize } = useHistory((state) => {
+    setNodes(state.nodes)
+    setConnections(state.connections)
+    setBorders(state.borders)
+  })
+
+  // Initialize history when component mounts
+  useEffect(() => {
+    const initialState = { nodes, connections, borders }
+    initialize(initialState)
+  }, []) // Empty dependency array - only run once on mount
 
   useEffect(() => {
     const fetchGithubStars = async () => {
@@ -47,10 +78,79 @@ function App() {
     fetchGithubStars()
   }, [])
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+        e.preventDefault()
+        undo()
+      } else if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') || ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+        e.preventDefault()
+        redo()
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault()
+        setProjectManagerOpen(true)
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        handleSaveProject({ nodes, connections, borders })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo, nodes, connections, borders])
+
   const handleCustomSizeChange = (width, height) => {
     setCustomWidth(width)
     setCustomHeight(height)
   }
+
+  const handleNodesChange = useCallback((newNodes) => {
+    setNodes(newNodes)
+    pushState({ nodes: newNodes, connections, borders })
+    if (autosaveEnabled) {
+      setTimeout(() => autosave({ nodes: newNodes, connections, borders }), 1000)
+    }
+  }, [connections, borders, pushState, autosaveEnabled, autosave])
+
+  const handleConnectionsChange = useCallback((newConnections) => {
+    setConnections(newConnections)
+    pushState({ nodes, connections: newConnections, borders })
+    if (autosaveEnabled) {
+      setTimeout(() => autosave({ nodes, connections: newConnections, borders }), 1000)
+    }
+  }, [nodes, borders, pushState, autosaveEnabled, autosave])
+
+  const handleBordersChange = useCallback((newBorders) => {
+    setBorders(newBorders)
+    pushState({ nodes, connections, borders: newBorders })
+    if (autosaveEnabled) {
+      setTimeout(() => autosave({ nodes, connections, borders: newBorders }), 1000)
+    }
+  }, [nodes, connections, pushState, autosaveEnabled, autosave])
+
+  const handleLoadProject = (projectId) => {
+    const projectData = loadProject(projectId)
+    if (projectData) {
+      setNodes(projectData.nodes || [])
+      setConnections(projectData.connections || [])
+      setBorders(projectData.borders || [])
+      resetHistory({ nodes: projectData.nodes || [], connections: projectData.connections || [], borders: projectData.borders || [] })
+      setProjectManagerOpen(false)
+    }
+  }
+
+  const handleSaveProject = (projectData, projectName) => {
+    saveProject(projectData, projectName)
+  }
+
+  const handleNewProject = useCallback(() => {
+    resetProject()
+    setNodes([])
+    setConnections([])
+    setBorders([])
+    resetHistory({ nodes: [], connections: [], borders: [] })
+    setProjectManagerOpen(false)
+  }, [resetProject, resetHistory])
 
   const handleExport = () => {
     const data = {
@@ -149,6 +249,35 @@ function App() {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
+            size="icon"
+            onClick={undo}
+            disabled={!canUndo}
+            title="Undo (Ctrl+Z)"
+            className="rounded-full"
+          >
+            <Undo className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={redo}
+            disabled={!canRedo}
+            title="Redo (Ctrl+Y)"
+            className="rounded-full"
+          >
+            <Redo className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setProjectManagerOpen(true)}
+            title="Project Manager (Ctrl+P)"
+            className="rounded-full"
+          >
+            <FolderOpen className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => window.open('https://github.com/kirosnn/schemati', '_blank')}
             title="View on GitHub"
@@ -229,9 +358,9 @@ function App() {
           nodes={nodes}
           connections={connections}
           borders={borders}
-          onNodesChange={setNodes}
-          onConnectionsChange={setConnections}
-          onBordersChange={setBorders}
+          onNodesChange={handleNodesChange}
+          onConnectionsChange={handleConnectionsChange}
+          onBordersChange={handleBordersChange}
           onSnapStateChange={(isSnapping, strength) => {
             // Optional: could be used for future features
           }}
@@ -247,6 +376,21 @@ function App() {
           onSubmit={exportPNGModal.onSubmit}
         />
       )}
+      <ProjectManager
+        isOpen={projectManagerOpen}
+        onClose={() => setProjectManagerOpen(false)}
+        projects={projects}
+        currentProjectId={currentProjectId}
+        onLoadProject={handleLoadProject}
+        onSaveProject={handleSaveProject}
+        onDeleteProject={deleteProject}
+        onRenameProject={renameProject}
+        onNewProject={handleNewProject}
+        onExportProject={exportProject}
+        onImportProject={importProject}
+        autosaveEnabled={autosaveEnabled}
+        onToggleAutosave={toggleAutosave}
+      />
     </div>
   )
 }
