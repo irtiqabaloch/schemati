@@ -156,6 +156,7 @@ function App() {
     const data = {
       nodes,
       connections,
+      borders,
       metadata: {
         version: '1.0',
         created: new Date().toISOString()
@@ -210,8 +211,10 @@ function App() {
       try {
         const data = JSON.parse(event.target?.result)
         if (data.nodes && data.connections) {
-          setNodes(data.nodes)
-          setConnections(data.connections)
+          setNodes(data.nodes || [])
+          setConnections(data.connections || [])
+          setBorders(data.borders || [])
+          resetHistory({ nodes: data.nodes || [], connections: data.connections || [], borders: data.borders || [] })
         } else {
           alert('Invalid file format')
         }

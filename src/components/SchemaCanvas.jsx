@@ -135,7 +135,7 @@ const SchemaCanvas = forwardRef(({
     }
   }))
 
-  const SNAP_THRESHOLD = 20
+  const SNAP_THRESHOLD = 15
 
   const drawNodeToContext = (ctx, node) => {
     const {
@@ -237,45 +237,57 @@ const SchemaCanvas = forwardRef(({
       ctx.setLineDash([])
     }
 
-    ctx.beginPath()
-    ctx.moveTo(from.x, from.y)
-
-    if (connection.style === 'straight') {
-      ctx.lineTo(to.x, to.y)
-    } else if (connection.style === 'curved') {
-      const controlPointOffset = Math.min(Math.abs(to.x - from.x) / 2, 100)
-      ctx.bezierCurveTo(
-        from.x + controlPointOffset, from.y,
-        to.x - controlPointOffset, to.y,
-        to.x, to.y
-      )
-    } else if (connection.style === 'orthogonal') {
-      const midX = (from.x + to.x) / 2
-      ctx.lineTo(midX, from.y)
-      ctx.lineTo(midX, to.y)
-      ctx.lineTo(to.x, to.y)
-    }
-
-    ctx.stroke()
-    ctx.setLineDash([])
+    let adjustedTo = { x: to.x, y: to.y }
+    let angle = 0
 
     if (arrowStyle !== 'none') {
-      let angle
       if (connection.style === 'orthogonal') {
         angle = from.x < to.x ? 0 : Math.PI
       } else {
         angle = Math.atan2(to.y - from.y, to.x - from.x)
       }
 
+      const arrowOffset = arrowSize * 1.1
+      adjustedTo = {
+        x: to.x - arrowOffset * Math.cos(angle),
+        y: to.y - arrowOffset * Math.sin(angle)
+      }
+    }
+
+    ctx.beginPath()
+    ctx.moveTo(from.x, from.y)
+
+    if (connection.style === 'straight') {
+      ctx.lineTo(adjustedTo.x, adjustedTo.y)
+    } else if (connection.style === 'curved') {
+      const curvature = connection.curvature !== undefined ? connection.curvature : 0.5
+      const distance = Math.sqrt(Math.pow(adjustedTo.x - from.x, 2) + Math.pow(adjustedTo.y - from.y, 2))
+      const controlPointOffset = distance * curvature
+      ctx.bezierCurveTo(
+        from.x + controlPointOffset, from.y,
+        adjustedTo.x - controlPointOffset, adjustedTo.y,
+        adjustedTo.x, adjustedTo.y
+      )
+    } else if (connection.style === 'orthogonal') {
+      const midX = (from.x + adjustedTo.x) / 2
+      ctx.lineTo(midX, from.y)
+      ctx.lineTo(midX, adjustedTo.y)
+      ctx.lineTo(adjustedTo.x, adjustedTo.y)
+    }
+
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    if (arrowStyle !== 'none') {
       ctx.beginPath()
-      ctx.moveTo(to.x, to.y)
+      ctx.moveTo(adjustedTo.x, adjustedTo.y)
       ctx.lineTo(
-        to.x - arrowSize * Math.cos(angle - Math.PI / 7),
-        to.y - arrowSize * Math.sin(angle - Math.PI / 7)
+        adjustedTo.x - arrowSize * Math.cos(angle - Math.PI / 7),
+        adjustedTo.y - arrowSize * Math.sin(angle - Math.PI / 7)
       )
       ctx.lineTo(
-        to.x - arrowSize * Math.cos(angle + Math.PI / 7),
-        to.y - arrowSize * Math.sin(angle + Math.PI / 7)
+        adjustedTo.x - arrowSize * Math.cos(angle + Math.PI / 7),
+        adjustedTo.y - arrowSize * Math.sin(angle + Math.PI / 7)
       )
       ctx.closePath()
 
@@ -559,45 +571,65 @@ const SchemaCanvas = forwardRef(({
       ctx.setLineDash([])
     }
 
-    ctx.beginPath()
-    ctx.moveTo(from.x, from.y)
-
-    if (connection.style === 'straight') {
-      ctx.lineTo(to.x, to.y)
-    } else if (connection.style === 'curved') {
-      const controlPointOffset = Math.min(Math.abs(to.x - from.x) / 2, 100)
-      ctx.bezierCurveTo(
-        from.x + controlPointOffset, from.y,
-        to.x - controlPointOffset, to.y,
-        to.x, to.y
-      )
-    } else if (connection.style === 'orthogonal') {
-      const midX = (from.x + to.x) / 2
-      ctx.lineTo(midX, from.y)
-      ctx.lineTo(midX, to.y)
-      ctx.lineTo(to.x, to.y)
-    }
-
-    ctx.stroke()
-    ctx.setLineDash([])
+    let adjustedTo = { x: to.x, y: to.y }
+    let angle = 0
 
     if (arrowStyle !== 'none') {
-      let angle
       if (connection.style === 'orthogonal') {
         angle = from.x < to.x ? 0 : Math.PI
       } else {
         angle = Math.atan2(to.y - from.y, to.x - from.x)
       }
 
+      const arrowOffset = arrowSize * 1.1
+      adjustedTo = {
+        x: to.x - arrowOffset * Math.cos(angle),
+        y: to.y - arrowOffset * Math.sin(angle)
+      }
+    }
+
+    ctx.beginPath()
+    ctx.moveTo(from.x, from.y)
+
+    if (connection.style === 'straight') {
+      ctx.lineTo(adjustedTo.x, adjustedTo.y)
+    } else if (connection.style === 'curved') {
+      const curvature = connection.curvature !== undefined ? connection.curvature : 0.5
+      const distance = Math.sqrt(Math.pow(adjustedTo.x - from.x, 2) + Math.pow(adjustedTo.y - from.y, 2))
+      const controlPointOffset = distance * curvature
+      ctx.bezierCurveTo(
+        from.x + controlPointOffset, from.y,
+        adjustedTo.x - controlPointOffset, adjustedTo.y,
+        adjustedTo.x, adjustedTo.y
+      )
+    } else if (connection.style === 'orthogonal') {
+      const midX = (from.x + adjustedTo.x) / 2
+      ctx.lineTo(midX, from.y)
+      ctx.lineTo(midX, adjustedTo.y)
+      ctx.lineTo(adjustedTo.x, adjustedTo.y)
+    }
+
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    if (arrowStyle !== 'none') {
+      const arrowLength = arrowSize
+      const arrowWidth = arrowSize * 0.6
+      const arrowBackX = adjustedTo.x - arrowLength * Math.cos(angle)
+      const arrowBackY = adjustedTo.y - arrowLength * Math.sin(angle)
+      
+      const perpAngle = angle + Math.PI / 2
+      const halfWidth = arrowWidth / 2
+      
       ctx.beginPath()
-      ctx.moveTo(to.x, to.y)
+      ctx.moveTo(adjustedTo.x, adjustedTo.y)
       ctx.lineTo(
-        to.x - arrowSize * Math.cos(angle - Math.PI / 7),
-        to.y - arrowSize * Math.sin(angle - Math.PI / 7)
+        arrowBackX + halfWidth * Math.cos(perpAngle),
+        arrowBackY + halfWidth * Math.sin(perpAngle)
       )
       ctx.lineTo(
-        to.x - arrowSize * Math.cos(angle + Math.PI / 7),
-        to.y - arrowSize * Math.sin(angle + Math.PI / 7)
+        arrowBackX - halfWidth * Math.cos(perpAngle),
+        arrowBackY - halfWidth * Math.sin(perpAngle)
       )
       ctx.closePath()
 
@@ -606,6 +638,7 @@ const SchemaCanvas = forwardRef(({
         ctx.fill()
       } else if (arrowStyle === 'outlined') {
         ctx.strokeStyle = color
+        ctx.lineWidth = width
         ctx.stroke()
       }
     }
@@ -614,7 +647,8 @@ const SchemaCanvas = forwardRef(({
   }
 
   const drawTempConnection = (ctx, fromNode, mousePos) => {
-    const from = getNodeCenter(fromNode)
+    const tempToNode = { x: mousePos.x, y: mousePos.y, width: 0, height: 0, shape: 'rectangle' }
+    const from = getNodeEdgePoint(fromNode, tempToNode)
 
     ctx.strokeStyle = '#9ca3af'
     ctx.lineWidth = 2
@@ -860,7 +894,7 @@ const SchemaCanvas = forwardRef(({
       if (snap.type === 'vertical' && !appliedVertical.has(snap.value)) {
         const edgePosition = elementEdges.find(e => e.name === snap.edgeName).position
         const fullOffset = snap.value - edgePosition
-        const easedOffset = fullOffset * Math.pow(snap.strength, 0.5)
+        const easedOffset = fullOffset * Math.pow(snap.strength, 3)
 
         snappedX += easedOffset
         appliedVertical.add(snap.value)
@@ -868,7 +902,7 @@ const SchemaCanvas = forwardRef(({
       } else if (snap.type === 'horizontal' && !appliedHorizontal.has(snap.value)) {
         const edgePosition = elementEdges.find(e => e.name === snap.edgeName).position
         const fullOffset = snap.value - edgePosition
-        const easedOffset = fullOffset * Math.pow(snap.strength, 0.5)
+        const easedOffset = fullOffset * Math.pow(snap.strength, 3)
 
         snappedY += easedOffset
         appliedHorizontal.add(snap.value)
@@ -896,10 +930,15 @@ const SchemaCanvas = forwardRef(({
       const alpha = 0.4 + (strength * 0.6)
       const lineWidth = 1.5 + (strength * 1.5)
 
-      ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`
+      const isSnapped = strength > 0.8
+      const red = isSnapped ? 239 : 59
+      const green = isSnapped ? 68 : 130
+      const blue = isSnapped ? 68 : 246
+
+      ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`
       ctx.lineWidth = lineWidth
       ctx.setLineDash([8, 4])
-      ctx.shadowColor = `rgba(59, 130, 246, ${strength * 0.4})`
+      ctx.shadowColor = `rgba(${red}, ${green}, ${blue}, ${strength * 0.4})`
       ctx.shadowBlur = strength * 6
 
       ctx.beginPath()
@@ -930,13 +969,123 @@ const SchemaCanvas = forwardRef(({
     const fromCenter = getNodeCenter(fromNode)
     const toCenter = getNodeCenter(toNode)
 
-    const angle = Math.atan2(toCenter.y - fromCenter.y, toCenter.x - fromCenter.x)
+    const dx = toCenter.x - fromCenter.x
+    const dy = toCenter.y - fromCenter.y
 
     if (fromNode.shape === 'circle') {
       const radius = Math.min(fromNode.width, fromNode.height) / 2
+      const angle = Math.atan2(dy, dx)
       return {
         x: fromCenter.x + radius * Math.cos(angle),
         y: fromCenter.y + radius * Math.sin(angle)
+      }
+    } else if (fromNode.shape === 'rectangle') {
+      const halfWidth = fromNode.width / 2
+      const halfHeight = fromNode.height / 2
+      
+      if (Math.abs(dx) < 0.0001) {
+        return {
+          x: fromCenter.x,
+          y: fromCenter.y + (dy >= 0 ? halfHeight : -halfHeight)
+        }
+      }
+      
+      if (Math.abs(dy) < 0.0001) {
+        return {
+          x: fromCenter.x + (dx >= 0 ? halfWidth : -halfWidth),
+          y: fromCenter.y
+        }
+      }
+      
+      const slope = dy / dx
+      const invSlope = dx / dy
+      
+      const rightX = halfWidth
+      const leftX = -halfWidth
+      const topY = -halfHeight
+      const bottomY = halfHeight
+      
+      const rightY = slope * rightX
+      const leftY = slope * leftX
+      const topX = invSlope * topY
+      const bottomX = invSlope * bottomY
+      
+      let edgeX, edgeY
+      
+      if (dx > 0 && dy > 0) {
+        if (rightY <= bottomY) {
+          edgeX = rightX
+          edgeY = rightY
+        } else {
+          edgeX = bottomX
+          edgeY = bottomY
+        }
+      } else if (dx > 0 && dy < 0) {
+        if (rightY >= topY) {
+          edgeX = rightX
+          edgeY = rightY
+        } else {
+          edgeX = topX
+          edgeY = topY
+        }
+      } else if (dx < 0 && dy > 0) {
+        if (leftY <= bottomY) {
+          edgeX = leftX
+          edgeY = leftY
+        } else {
+          edgeX = bottomX
+          edgeY = bottomY
+        }
+      } else {
+        if (leftY >= topY) {
+          edgeX = leftX
+          edgeY = leftY
+        } else {
+          edgeX = topX
+          edgeY = topY
+        }
+      }
+      
+      return {
+        x: fromCenter.x + edgeX,
+        y: fromCenter.y + edgeY
+      }
+    } else if (fromNode.shape === 'diamond') {
+      const halfWidth = fromNode.width / 2
+      const halfHeight = fromNode.height / 2
+      
+      if (Math.abs(dx) < 0.0001) {
+        return {
+          x: fromCenter.x,
+          y: fromCenter.y + (dy >= 0 ? halfHeight : -halfHeight)
+        }
+      }
+      
+      if (Math.abs(dy) < 0.0001) {
+        return {
+          x: fromCenter.x + (dx >= 0 ? halfWidth : -halfWidth),
+          y: fromCenter.y
+        }
+      }
+      
+      const absDx = Math.abs(dx)
+      const absDy = Math.abs(dy)
+      const slope = absDy / absDx
+      const diamondSlope = halfHeight / halfWidth
+      
+      let edgeX, edgeY
+      
+      if (slope <= diamondSlope) {
+        edgeX = dx >= 0 ? halfWidth : -halfWidth
+        edgeY = edgeX * (dy / dx)
+      } else {
+        edgeY = dy >= 0 ? halfHeight : -halfHeight
+        edgeX = edgeY * (dx / dy)
+      }
+      
+      return {
+        x: fromCenter.x + edgeX,
+        y: fromCenter.y + edgeY
       }
     }
 
@@ -1052,14 +1201,9 @@ const SchemaCanvas = forwardRef(({
     if (clickedNode) {
       setSelectedElement({ type: 'node', id: clickedNode.id })
 
-      const menuWidth = 200
-      const menuHeight = 400
-      const adjustedX = Math.min(e.clientX, window.innerWidth - menuWidth)
-      const adjustedY = Math.min(e.clientY, window.innerHeight - menuHeight)
-
       setContextMenu({
-        x: adjustedX,
-        y: adjustedY,
+        x: e.clientX,
+        y: e.clientY,
         type: 'node',
         target: clickedNode,
         options: [
@@ -1224,14 +1368,9 @@ const SchemaCanvas = forwardRef(({
     } else if (clickedConnection) {
       setSelectedElement({ type: 'connection', id: clickedConnection.id })
 
-      const menuWidth = 200
-      const menuHeight = 500
-      const adjustedX = Math.min(e.clientX, window.innerWidth - menuWidth)
-      const adjustedY = Math.min(e.clientY, window.innerHeight - menuHeight)
-
       setContextMenu({
-        x: adjustedX,
-        y: adjustedY,
+        x: e.clientX,
+        y: e.clientY,
         type: 'connection',
         target: clickedConnection,
         options: [
@@ -1246,6 +1385,7 @@ const SchemaCanvas = forwardRef(({
                   { name: 'width', label: 'Line Width (px)', type: 'number', defaultValue: clickedConnection.width || 2.5, min: 0.5, max: 20, step: 0.1 },
                   { name: 'opacity', label: 'Opacity', type: 'number', defaultValue: clickedConnection.opacity || 1, min: 0, max: 1, step: 0.01 },
                   { name: 'arrowSize', label: 'Arrow Size (px)', type: 'number', defaultValue: clickedConnection.arrowSize || 12, min: 5, max: 30, step: 0.1 },
+                  { name: 'curvature', label: 'Curvature', type: 'number', defaultValue: clickedConnection.curvature !== undefined ? clickedConnection.curvature : 0.5, min: 0, max: 2, step: 0.1 },
                   { name: 'dashLength', label: 'Dash Length (px)', type: 'number', defaultValue: clickedConnection.dashLength || 8, min: 1, max: 50, step: 0.1 },
                   { name: 'gapLength', label: 'Gap Length (px)', type: 'number', defaultValue: clickedConnection.gapLength || 4, min: 1, max: 50, step: 0.1 }
                 ],
@@ -1257,6 +1397,7 @@ const SchemaCanvas = forwardRef(({
                       width: parseFloat(values.width),
                       opacity: parseFloat(values.opacity),
                       arrowSize: parseFloat(values.arrowSize),
+                      curvature: parseFloat(values.curvature),
                       dashLength: parseFloat(values.dashLength),
                       gapLength: parseFloat(values.gapLength)
                     } : c
@@ -1362,14 +1503,9 @@ const SchemaCanvas = forwardRef(({
     } else if (clickedBorder) {
       setSelectedElement({ type: 'border', id: clickedBorder.id })
 
-      const menuWidth = 200
-      const menuHeight = 400
-      const adjustedX = Math.min(e.clientX, window.innerWidth - menuWidth)
-      const adjustedY = Math.min(e.clientY, window.innerHeight - menuHeight)
-
       setContextMenu({
-        x: adjustedX,
-        y: adjustedY,
+        x: e.clientX,
+        y: e.clientY,
         type: 'border',
         target: clickedBorder,
         options: [
@@ -1429,15 +1565,45 @@ const SchemaCanvas = forwardRef(({
       const fromNode = nodes.find(n => n.id === connection.from)
       const toNode = nodes.find(n => n.id === connection.to)
       if (fromNode && toNode) {
-        const from = getNodeCenter(fromNode)
-        const to = getNodeCenter(toNode)
-        const distance = distanceToLine(x, y, from.x, from.y, to.x, to.y)
+        const from = getNodeEdgePoint(fromNode, toNode)
+        const to = getNodeEdgePoint(toNode, fromNode)
+        
+        let distance
+        if (connection.style === 'curved') {
+          const curvature = connection.curvature !== undefined ? connection.curvature : 0.5
+          const dist = Math.sqrt(Math.pow(to.x - from.x, 2) + Math.pow(to.y - from.y, 2))
+          const controlPointOffset = dist * curvature
+          const cp1x = from.x + controlPointOffset
+          const cp1y = from.y
+          const cp2x = to.x - controlPointOffset
+          const cp2y = to.y
+          distance = distanceToBezierCurve(x, y, from.x, from.y, cp1x, cp1y, cp2x, cp2y, to.x, to.y)
+        } else {
+          distance = distanceToLine(x, y, from.x, from.y, to.x, to.y)
+        }
+        
         if (distance < 15) {
           return connection
         }
       }
     }
     return null
+  }
+  
+  const distanceToBezierCurve = (px, py, x0, y0, x1, y1, x2, y2, x3, y3) => {
+    let minDistance = Infinity
+    const steps = 100
+    
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps
+      const mt = 1 - t
+      const x = mt * mt * mt * x0 + 3 * mt * mt * t * x1 + 3 * mt * t * t * x2 + t * t * t * x3
+      const y = mt * mt * mt * y0 + 3 * mt * mt * t * y1 + 3 * mt * t * t * y2 + t * t * t * y3
+      const distance = Math.sqrt(Math.pow(px - x, 2) + Math.pow(py - y, 2))
+      minDistance = Math.min(minDistance, distance)
+    }
+    
+    return minDistance
   }
 
   const distanceToLine = (px, py, x1, y1, x2, y2) => {

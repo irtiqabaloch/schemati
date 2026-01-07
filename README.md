@@ -19,7 +19,7 @@ Create diagrams and flowcharts with ease. A powerful and intuitive diagramming t
 ## Getting Started
 
 ### Online Version
-Visit [Schemati](https://kirosnn.github.io/schemati) to use the application directly in your browser!
+Visit [Schemati](https://schemati.vercel.app/) to use the application directly in your browser!
 
 ### Local Development
 
@@ -47,8 +47,6 @@ npm run dev
 ```
 
 4. Open your browser and navigate to `http://localhost:5173`
-
-5. Or online with : https://schemati.vercel.app/
 
 ## Usage
 
