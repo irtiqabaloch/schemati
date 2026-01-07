@@ -2,14 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import { chatWithMistral } from '../services/mistralService'
 
 export const useAgentChat = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! I can help you create diagrams and flowcharts. What would you like to build?',
-      timestamp: new Date()
-    }
-  ])
+  const [messages, setMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const abortControllerRef = useRef(null)
@@ -73,14 +66,7 @@ export const useAgentChat = () => {
   }, [messages, isLoading])
 
   const clearChat = useCallback(() => {
-    setMessages([
-      {
-        id: '1',
-        role: 'assistant',
-        content: 'Hello! I can help you create diagrams and flowcharts. What would you like to build?',
-        timestamp: new Date()
-      }
-    ])
+    setMessages([])
     setError(null)
   }, [])
 

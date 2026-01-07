@@ -1,9 +1,6 @@
 const MISTRAL_MODEL = 'devstral-medium-latest'
 
 const getApiUrl = () => {
-  if (import.meta.env.DEV) {
-    return '/api/chat'
-  }
   return '/api/chat'
 }
 
@@ -32,18 +29,22 @@ export const chatWithMistral = async (messages, onUpdate) => {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let fullText = ''
+    let buffer = ''
 
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
-      const chunk = decoder.decode(value)
-      const lines = chunk.split('\n').filter(line => line.trim() !== '')
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
 
       for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6)
-          if (data === '[DONE]') break
+        const trimmedLine = line.trim()
+        if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
+
+        if (trimmedLine.startsWith('data: ')) {
+          const data = trimmedLine.slice(6)
 
           try {
             const parsed = JSON.parse(data)
@@ -55,7 +56,7 @@ export const chatWithMistral = async (messages, onUpdate) => {
               }
             }
           } catch (e) {
-            console.error('Parse error:', e)
+            console.warn('Parse error for line:', trimmedLine, e)
           }
         }
       }
