@@ -5,7 +5,6 @@ function MobileWarning() {
     <div
       className="lg:hidden fixed inset-0 z-[9999] bg-background flex items-center justify-center p-6 overflow-hidden w-screen max-w-[100vw]"
       style={{
-        height: '100vh',
         height: '100dvh',
         minHeight: '-webkit-fill-available'
       }}

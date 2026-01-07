@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Trash2, Square } from 'lucide-react'
+import { ArrowUp, Trash2, Square } from 'lucide-react'
 import { useAgentChat } from '../hooks/useAgentChat'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
@@ -79,15 +79,15 @@ function AgentSidebar({ agentSidebarOpen, agentSidebarTop }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-border">
-        <form onSubmit={handleSubmit} className="flex gap-2">
+      <div className="p-4 bg-transparent">
+        <form onSubmit={handleSubmit} className="relative">
           <Textarea
             ref={textareaRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            className="min-h-[44px] max-h-[120px] resize-none flex-1"
+            className="min-h-[44px] max-h-[120px] resize-none pr-12 bg-transparent"
             disabled={isLoading}
           />
           {isLoading ? (
@@ -96,7 +96,7 @@ function AgentSidebar({ agentSidebarOpen, agentSidebarTop }) {
               onClick={stopGeneration}
               variant="destructive"
               size="icon"
-              className="h-11 w-11 shrink-0"
+              className="h-8 w-8 rounded-full absolute right-2 bottom-2"
             >
               <Square className="h-4 w-4" />
             </Button>
@@ -105,9 +105,9 @@ function AgentSidebar({ agentSidebarOpen, agentSidebarTop }) {
               type="submit"
               disabled={!inputValue.trim() || isLoading}
               size="icon"
-              className="h-11 w-11 shrink-0"
+              className="h-8 w-8 rounded-full absolute right-2 bottom-2"
             >
-              <Send className="h-4 w-4" />
+              <ArrowUp className="h-4 w-4" />
             </Button>
           )}
         </form>
