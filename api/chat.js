@@ -13,7 +13,13 @@ export default async function handler(req) {
   const apiKey = process.env.MISTRAL_API_KEY
 
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'API key not configured' }), {
+    return new Response(JSON.stringify({
+      error: 'API key not configured',
+      debug: {
+        hasKey: !!apiKey,
+        envKeys: Object.keys(process.env).filter(k => k.includes('MISTRAL'))
+      }
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
