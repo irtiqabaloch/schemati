@@ -18,7 +18,7 @@ function Navbar({
   return (
     <header
       ref={headerRef}
-      className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-3 flex items-center justify-between shadow-sm z-50 relative"
+      className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-3 hidden lg:flex items-center justify-between shadow-sm z-50 relative"
     >
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">

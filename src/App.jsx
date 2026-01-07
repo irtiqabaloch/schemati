@@ -274,7 +274,7 @@ function App() {
         agentSidebarOpen={agentSidebarOpen}
         onToggleAgent={() => setAgentSidebarOpen(!agentSidebarOpen)}
       />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden hidden lg:flex">
         <Sidebar
           tool={tool}
           onToolChange={setTool}

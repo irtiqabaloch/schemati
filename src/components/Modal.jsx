@@ -56,8 +56,8 @@ export default function Modal({ isOpen, onClose, title, fields, onSubmit }) {
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm hidden lg:flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
       <div

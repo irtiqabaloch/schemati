@@ -73,8 +73,8 @@ export default function ProjectManager({
   if (!isOpen) return null
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm hidden lg:flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
       <div className="bg-card border border-border rounded-lg shadow-2xl max-w-4xl w-full max-h-[80vh] flex flex-col overflow-hidden">
