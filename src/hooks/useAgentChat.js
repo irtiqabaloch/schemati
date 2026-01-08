@@ -47,9 +47,13 @@ export const useAgentChat = () => {
           }
           return newMessages
         })
-      })
+      }, abortControllerRef.current.signal)
     } catch (err) {
-      console.error('Chat error:', err)
+      if (err.name === 'AbortError') {
+        setMessages(prev => prev.slice(0, -1))
+        return
+      }
+
       setError(err.message || 'Failed to send message')
       setMessages(prev => {
         const newMessages = [...prev]

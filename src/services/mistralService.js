@@ -1,10 +1,11 @@
 const MISTRAL_MODEL = 'devstral-medium-latest'
+const REQUEST_TIMEOUT = 20000
 
 const getApiUrl = () => {
   return '/api/chat'
 }
 
-export const chatWithMistral = async (messages, onUpdate) => {
+export const chatWithMistral = async (messages, onUpdate, abortSignal) => {
   try {
     const response = await fetch(getApiUrl(), {
       method: 'POST',
@@ -17,12 +18,24 @@ export const chatWithMistral = async (messages, onUpdate) => {
           role: msg.role,
           content: msg.content
         })),
-        max_tokens: 4096
-      })
+        max_tokens: 2048
+      }),
+      signal: abortSignal
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+
+      if (response.status === 504) {
+        throw new Error('The server is taking too long to respond. Please try again.')
+      }
+      if (response.status === 503) {
+        throw new Error('The service is temporarily unavailable. Please try again in a few moments.')
+      }
+      if (response.status === 429) {
+        throw new Error('Too many requests. Please wait before trying again.')
+      }
+
       throw new Error(errorData.error || `API error: ${response.status}`)
     }
 
@@ -64,7 +77,9 @@ export const chatWithMistral = async (messages, onUpdate) => {
 
     return fullText
   } catch (error) {
-    console.error('Mistral API error:', error)
+    if (error.name === 'AbortError') {
+      throw error
+    }
     throw error
   }
 }
