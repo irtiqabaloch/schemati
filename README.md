@@ -64,6 +64,12 @@ npm run dev
 - **Import/Export**: Export projects as JSON files or import existing ones
 - **History**: Full undo/redo support with Ctrl+Z/Ctrl+Y
 
+### Example 
+
+Schema's AI agent explained by itself :
+
+<img src="schemati-diagram.png" alt="AI Example" width="1000"/>
+
 ### Tips
 - Projects are automatically saved to your browser's localStorage
 - Use magnetic snapping for precise alignment
