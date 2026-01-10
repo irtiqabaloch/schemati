@@ -166,6 +166,9 @@ export const createConnection = ({
   lineStyle = 'solid',
   dashLength = 5,
   gapLength = 5,
+  width = 3,
+  arrowSize = 16,
+  arrowStyle = 'filled',
   ...otherProps
 }) => {
   return {
@@ -177,6 +180,9 @@ export const createConnection = ({
     lineStyle,
     dashLength,
     gapLength,
+    width,
+    arrowSize,
+    arrowStyle,
     ...otherProps
   }
 }

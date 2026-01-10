@@ -432,7 +432,7 @@ const SchemaCanvas = forwardRef(({
         const from = getNodeEdgePoint(fromNode, toNode)
         const to = getNodeEdgePoint(toNode, fromNode)
 
-        const { color, width = 2.5, opacity = 1, lineStyle = 'solid', dashLength = 8, gapLength = 4, arrowSize = 12 } = connection
+        const { color, width = 3, opacity = 1, lineStyle = 'solid', dashLength = 8, gapLength = 4, arrowSize = 16 } = connection
 
         let pathD = ''
         let strokeDasharray = 'none'
@@ -581,12 +581,12 @@ const SchemaCanvas = forwardRef(({
 
     const {
       color,
-      width = 2.5,
+      width = 3,
       opacity = 1,
       lineStyle = 'solid',
       dashLength = 8,
       gapLength = 4,
-      arrowSize = 12,
+      arrowSize = 16,
       arrowStyle = 'filled'
     } = connection
 
@@ -996,12 +996,12 @@ const SchemaCanvas = forwardRef(({
 
     const {
       color,
-      width = 2.5,
+      width = 3,
       opacity = 1,
       lineStyle = 'solid',
       dashLength = 8,
       gapLength = 4,
-      arrowSize = 12,
+      arrowSize = 16,
       arrowStyle = 'filled'
     } = connection
 
@@ -1064,10 +1064,10 @@ const SchemaCanvas = forwardRef(({
 
     if (arrowStyle !== 'none') {
       const arrowLength = arrowSize
-      const arrowWidth = arrowSize * 0.6
+      const arrowWidth = arrowSize * 0.75
       const arrowBackX = adjustedTo.x - arrowLength * Math.cos(angle)
       const arrowBackY = adjustedTo.y - arrowLength * Math.sin(angle)
-      
+
       const perpAngle = angle + Math.PI / 2
       const halfWidth = arrowWidth / 2
       
