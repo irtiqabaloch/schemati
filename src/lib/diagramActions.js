@@ -112,7 +112,7 @@ export const calculateAutoPosition = (existingNodes, layout = 'smart', options =
     }
   }
 
-  if (layout === 'smart') {
+  if (layout === 'smart' || layout === 'vertical') {
     if (existingNodes.length <= 8) {
       const centerX = startX + 200
       const currentY = startY + (existingNodes.length * verticalSpacing)
