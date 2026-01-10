@@ -113,6 +113,12 @@ export const calculateAutoPosition = (existingNodes, layout = 'smart', options =
   }
 
   if (layout === 'smart') {
+    if (existingNodes.length <= 8) {
+      const centerX = startX + 200
+      const currentY = startY + (existingNodes.length * verticalSpacing)
+      return { x: centerX, y: currentY }
+    }
+
     const occupiedPositions = existingNodes.map(n => ({
       x: n.x,
       y: n.y,
